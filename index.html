@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>index</title>
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+	<script type="text/javascript">
+		
+		window.onload=function() {
+
+			var ul=document.querySelector("#menu ul");
+
+			var active=document.querySelector("#menu ul li.active");
+
+			ul.onclick=function(event) {
+				var target=event.target;
+				if(target.tagName!=="LI") return;
+				active.classList.remove("active");
+				target.classList.add("active");
+				LoadData(target);
+			}
+			LoadData(active);
+
+
+			// postsend.onclick=function() {
+			//     var xhr=new XMLHttpRequest();
+			//     xhr.open("POST", "/postsend", true);
+			//     var body="myinput=" + encodeURIComponent(p1.value);
+			//     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");//для POST-запиту
+			//     xhr.onreadystatechange=function() {
+			//     	if(xhr.readyState==4) {
+			//     		alert(xhr.responseText);
+			//     	}
+			//     }
+			//     xhr.send(body);
+		 //    }
+		}
+
+
+
+
+
+
+
+		function LoadData(li) {
+			var xhr=new XMLHttpRequest();
+			var path; //шлях куди ми будемо підставляти
+			if(li.innerHTML=="Перегляд"){
+				path="/list";
+			}
+			else{
+				path="/form";
+			}
+			xhr.open("GET", path, true);
+			xhr.send();
+			xhr.onreadystatechange=function() {
+				if(xhr.readyState==4){
+					if(li.innerHTML=="Перегляд"){
+						ParseJson(xhr.responseText, content);
+						return
+					}
+					content.innerHTML=xhr.responseText;
+				}
+			}
+		}
+
+
+
+
+
+
+		function ParseJson(file, cont) {
+			// cont.innerHTML="";
+			// var ul=document.createElement("ul");
+			// cont.appendChild(ul);
+			// file=JSON.parse(file);
+			// for(var i=0; i<file.length; i++){
+			// 	var li=document.createElement("li");
+			// 	ul.appendChild(li);
+			// 	li.innerHTML=file[i].Firstname + " " + file[i].Lastname + " " + file[i].Salary;
+			// }
+
+			file=JSON.parse(file);
+			cont.innerHTML="";
+			var mas=[];
+			for(var key in file[0]){
+				mas.push(key);
+			}
+			mas.push("");
+			var table=document.createElement("table");
+			cont.appendChild(table);
+			var tr=document.createElement("tr");
+			table.appendChild(tr);
+			for(var i=0; i<mas.length; i++){
+				var td=document.createElement("td");
+				tr.appendChild(td);
+				td.innerHTML=mas[i];
+				td.classList.add("header");
+			}
+			for(var i=0; i<file.length; i++){
+				tr=document.createElement("tr");
+				table.appendChild(tr);
+				for(var j=0; j<mas.length-1; j++){
+					td=document.createElement("td");
+					tr.appendChild(td);
+					td.innerHTML=file[i][mas[j]];//file[i]=obj; [mas[j]]=[key] =>obj[key]
+				}
+				var td=document.createElement("td");
+				var btn=document.createElement("button");
+				btn.innerHTML="Delete";
+				btn.classList.add("btn");
+				td.appendChild(btn);
+				btn.onclick=DelClick;//знищує
+				tr.appendChild(td);
+			}
+		}
+
+
+
+
+
+
+		function GetSend() {
+			var inputs=document.querySelectorAll("form input[type='text']");
+			for(var i=0; i<inputs.length; i++){
+				if(inputs[i].value=="" || inputs[i].value==" "){
+					alert("Введіть дані у всі поля!");
+					return;
+				}
+			}
+				var xhr=new XMLHttpRequest();
+				var params="Firstname=" + encodeURIComponent(Firstname.value) + "&Lastname=" + encodeURIComponent(Lastname.value) + "&Salary=" + encodeURIComponent(Salary.value);
+				//encodeURIComponent(Firstname.value) параметр, в якому Firstname==id з form.html
+				xhr.open("GET", "/formget?"+params, true);
+				xhr.send();
+				xhr.onreadystatechange=function(){
+					if(xhr.readyState==4){
+						for(var i=0; i<inputs.length; i++){
+							inputs[i].value="";
+						}
+						alert(xhr.responseText);
+					}
+				}
+			
+		}
+
+
+
+
+
+		function DelClick() {
+			var parent=this.parentNode.parentNode;//==tr
+			var id=parent.rowIndex-1;
+			console.log(id);
+			var xhr=new XMLHttpRequest();
+			var body="id=" + encodeURIComponent(id)
+			xhr.open("POST", "/formsendpost", true);//POST-запит
+			
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");//для POST-запиту
+			xhr.onreadystatechange=function() {
+				if(xhr.readyState==4) {
+					ParseJson(xhr.responseText, content);
+				}
+
+			}
+			xhr.send(body);//для POST-запиту
+		}
+
+		
+
+
+
+
+
+
+
+
+
+
+	</script>
+
+</head>
+<body>
+
+<div id="menu">
+    <ul>
+    	<li class="active">Перегляд</li>
+    	<li>Ввід</li>
+    </ul>
+</div>
+
+<div id="content"></div>
+
+
+<div id="get-post">	
+
+<form class="get-post" method="GET" action="/myget">
+	
+	<input type="text" id="p1" name="myinput">
+	<input type="submit" value="GET" name="">
+	
+</form>
+
+<!-- <form class="get-post" method="POST" action="/mypost">
+	
+	<input type="submit" value="POST" name="">
+	<input type="text" id="p1" name="myinput">
+	
+</form>
+ -->
+</div>
+
+
+<!-- <form id="newform">
+	<input type="text" id="p1" name="myinput">
+
+	<input type="button" id="postsend" value="POST" name="">
+</form>
+ -->
+
+
+</body>
+</html>

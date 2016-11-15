@@ -1,0 +1,28 @@
+{
+  "name": "myajaxform",
+  "version": "1.0.0",
+  "description": "ajax form",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foksana/form.git"
+  },
+  "keywords": [
+    "form",
+    "ajax"
+  ],
+  "author": "foksana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/foksana/form/issues"
+  },
+  "homepage": "https://github.com/foksana/form#readme",
+  "devDependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0"
+  }
+}
